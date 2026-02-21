@@ -65,6 +65,7 @@ class ViewController: UIViewController {
             viewModel.fetchWeather(for: "Isparta")
         }
     @objc private func buttonTapped() {
+<<<<<<< HEAD
         view.endEditing(true)
         guard let userInput = textField.text, !userInput.isEmpty,
               let weatherInfo = label.text else { return }
@@ -80,6 +81,21 @@ class ViewController: UIViewController {
                     self.tracks = tracks // Gelen şarkıları listeye kaydet.
                     self.tableView.reloadData() // "Veri değişti, ekranı tekrar çiz" komutu.
                     self.label.text = "İşte Atmosferin İçin Seçtiğim Şarkılar!"
+=======
+        guard let userInput = textField.text, !userInput.isEmpty,
+              let weatherInfo = label.text else { return }
+        
+        print("AI'ya soruluyor...")
+        
+        aiService.generateMusicQuery(weather: weatherInfo, userInput: userInput) { [weak self] musicQuery in
+            
+            DispatchQueue.main.async {
+                if let query = musicQuery {
+                    print("AI Önerisi: \(query)")
+                    self?.label.text = "Senin için önerim:\n\(query)"
+                } else {
+                    self?.label.text = "AI şu an meşgul, tekrar dene."
+>>>>>>> df8947da84d6671d41f9b414a2198ea779ba7a67
                 }
             }
         }
