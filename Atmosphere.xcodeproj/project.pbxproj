@@ -11,6 +11,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		555F00102F49F91500869182 /* Exceptions for "Networking" folder in "Atmosphere" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AIService.swift,
+				MusicService.swift,
+				Secrets.swift,
+			);
+			target = 555FFFC92F4656A200869182 /* Atmosphere */;
+		};
 		555FFFDC2F4656A300869182 /* Exceptions for "Atmosphere" folder in "Atmosphere" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -28,6 +37,7 @@
 		555FFFF12F46642100869182 /* Exceptions for "Models" folder in "Atmosphere" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Track.swift,
 				WeatherModel.swift,
 			);
 			target = 555FFFC92F4656A200869182 /* Atmosphere */;
@@ -35,8 +45,6 @@
 		555FFFF22F472DC500869182 /* Exceptions for "Views" folder in "Atmosphere" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				AIService.swift,
-				Secrets.swift,
 				ViewController.swift,
 			);
 			target = 555FFFC92F4656A200869182 /* Atmosphere */;
@@ -44,6 +52,14 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		555F000F2F49F8F500869182 /* Networking */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				555F00102F49F91500869182 /* Exceptions for "Networking" folder in "Atmosphere" target */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
 		555FFFCC2F4656A200869182 /* Atmosphere */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -120,6 +136,7 @@
 				555FFFE82F46589800869182 /* Models */,
 				555FFFE72F46589100869182 /* ViewModels */,
 				555FFFE62F46588900869182 /* Views */,
+				555F000F2F49F8F500869182 /* Networking */,
 			);
 			path = Atmosphere;
 			sourceTree = "<group>";

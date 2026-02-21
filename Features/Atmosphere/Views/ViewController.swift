@@ -8,10 +8,11 @@
 import UIKit
 
 class ViewController: UIViewController {
-
+    let musicService = MusicService()
     let viewModel = WeatherViewModel()
+    private var tracks: [Track] = []
     private var currentWeather: WeatherResponse?
-
+    let aiService = AIService()
     private let label: UILabel = {
             let l = UILabel()
             l.numberOfLines = 0
@@ -35,6 +36,13 @@ class ViewController: UIViewController {
         tf.translatesAutoresizingMaskIntoConstraints = false
         return tf
     }()
+    private let tableView: UITableView = {
+        let tv = UITableView()
+        tv.translatesAutoresizingMaskIntoConstraints = false
+        tv.backgroundColor = .clear
+        tv.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        return tv
+    }()
     
     private let actionButton: UIButton = {
         let button = UIButton(type: .system)
@@ -47,6 +55,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
             super.viewDidLoad()
             view.backgroundColor = .systemBackground
+        tableView.dataSource = self
+        tableView.delegate = self
             setupUI()
             setupBindings()
         actionButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
@@ -55,17 +65,25 @@ class ViewController: UIViewController {
             viewModel.fetchWeather(for: "Isparta")
         }
     @objc private func buttonTapped() {
-        guard let userInput = textField.text, !userInput.isEmpty, let weather = currentWeather else { return }
-        let condition = weather.weather.first?.main ?? ""
-
-        print("Kullanıcı input:", userInput)
-        print("Hava:", condition)
-
-        let fakeQuery = "lofi study"
+        view.endEditing(true)
+        guard let userInput = textField.text, !userInput.isEmpty,
+              let weatherInfo = label.text else { return }
         
-        print("AI query:", fakeQuery)
+        label.text = "Atmosferin aranıyor..." // Kullanıcıya geri bildirim
+        
+        aiService.generateMusicQuery(weather: weatherInfo, userInput: userInput) { [weak self] musicQuery in
+            guard let self = self, let query = musicQuery else { return }
+            
+            // AI'dan gelen terimle iTunes araması başlatıyoruz.
+            self.musicService.searchMusic(term: query) { tracks in
+                DispatchQueue.main.async {
+                    self.tracks = tracks // Gelen şarkıları listeye kaydet.
+                    self.tableView.reloadData() // "Veri değişti, ekranı tekrar çiz" komutu.
+                    self.label.text = "İşte Atmosferin İçin Seçtiğim Şarkılar!"
+                }
+            }
+        }
     }
-
     
     private func getWeatherStyle(for condition: String) -> (symbolName: String, color: UIColor) {
         switch condition {
@@ -85,6 +103,7 @@ class ViewController: UIViewController {
     private func setupUI() {
             view.addSubview(label)
             view.addSubview(iconImageView)
+            view.addSubview(tableView)
             view.addSubview(textField)
             view.addSubview(actionButton)
             NSLayoutConstraint.activate([
@@ -101,7 +120,12 @@ class ViewController: UIViewController {
                 textField.heightAnchor.constraint(equalToConstant: 44),
 
                 actionButton.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 20),
-                actionButton.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+                actionButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                tableView.topAnchor.constraint(equalTo: actionButton.bottomAnchor, constant: 20),
+                    tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                    tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                    // Ekranın en altına kadar gitsin.
+                    tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
 
                 
             ])
@@ -127,3 +151,18 @@ class ViewController: UIViewController {
     }
 }
 
+extension ViewController: UITableViewDataSource, UITableViewDelegate {
+    // Kural 1: Kaç satır olacak?
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return tracks.count
+    }
+    
+    // Kural 2: Her satırda ne yazacak?
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        let track = tracks[indexPath.row]
+        // Şarkı ve Sanatçı adını yazdırıyoruz.
+        cell.textLabel?.text = "\(track.artistName ?? "") - \(track.trackName ?? "")"
+        return cell
+    }
+}
