@@ -11,7 +11,7 @@ class ViewController: UIViewController {
 
     let viewModel = WeatherViewModel()
     private var currentWeather: WeatherResponse?
-
+    let aiService = AIService()
     private let label: UILabel = {
             let l = UILabel()
             l.numberOfLines = 0
@@ -55,17 +55,23 @@ class ViewController: UIViewController {
             viewModel.fetchWeather(for: "Isparta")
         }
     @objc private func buttonTapped() {
-        guard let userInput = textField.text, !userInput.isEmpty, let weather = currentWeather else { return }
-        let condition = weather.weather.first?.main ?? ""
-
-        print("Kullanıcı input:", userInput)
-        print("Hava:", condition)
-
-        let fakeQuery = "lofi study"
+        guard let userInput = textField.text, !userInput.isEmpty,
+              let weatherInfo = label.text else { return }
         
-        print("AI query:", fakeQuery)
+        print("AI'ya soruluyor...")
+        
+        aiService.generateMusicQuery(weather: weatherInfo, userInput: userInput) { [weak self] musicQuery in
+            
+            DispatchQueue.main.async {
+                if let query = musicQuery {
+                    print("AI Önerisi: \(query)")
+                    self?.label.text = "Senin için önerim:\n\(query)"
+                } else {
+                    self?.label.text = "AI şu an meşgul, tekrar dene."
+                }
+            }
+        }
     }
-
     
     private func getWeatherStyle(for condition: String) -> (symbolName: String, color: UIColor) {
         switch condition {

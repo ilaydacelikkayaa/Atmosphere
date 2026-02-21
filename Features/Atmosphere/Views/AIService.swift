@@ -1,44 +1,59 @@
-//
-//  AIService.swift
-//  Atmosphere
-//
-//  Created by İlayda Çelikkaya on 19.02.2026.
-//
-
 import Foundation
 
-class AIService{
+class AIService {
     private let apiKey = Secrets.geminiApiKey
-    func generateMusicQuery(weather: String,
-                            userInput: String,
-                            completion: @escaping (String?) -> Void){ //completion asenkron oldugu icin beklemeyi saglar
-        let prompt = "Hava: \(weather), Amaç: \(userInput)"
-        let urlString = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=\(Secrets.geminiApiKey)"
-        guard let url = URL(string: urlString) else {
-                 completion(nil)
-                 return
-             }
+    private let baseUrl = "https://generativelanguage.googleapis.com"
+
+    func generateMusicQuery(weather: String, userInput: String, completion: @escaping (String?) -> Void) {
+        
+        print(" Uygun model aranıyor...")
+        let listModelsUrl = URL(string: "\(baseUrl)/v1beta/models?key=\(apiKey)")!
+        
+        URLSession.shared.dataTask(with: listModelsUrl) { [weak self] data, response, error in
+            guard let self = self, let data = data else {
+                completion(nil)
+                return
+            }
+            
+            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+            let models = json?["models"] as? [[String: Any]] ?? []
+            
+            // İçerik üretebilen ilk 'gemini' modelini seç
+            let activeModel = models.first { model in
+                let name = model["name"] as? String ?? ""
+                let methods = model["supportedGenerationMethods"] as? [String] ?? []
+                return name.contains("gemini") && methods.contains("generateContent")
+            }
+            
+            let modelPath = activeModel?["name"] as? String ?? "models/gemini-1.5-flash"
+            print("Seçilen Aktif Model: \(modelPath)")
+            
+            self.sendRequest(to: modelPath, weather: weather, userInput: userInput, completion: completion)
+            
+        }.resume()
+    }
+    
+    private func sendRequest(to modelPath: String, weather: String, userInput: String, completion: @escaping (String?) -> Void) {
+        let urlString = "\(baseUrl)/v1beta/\(modelPath):generateContent?key=\(apiKey)"
+        guard let url = URL(string: urlString) else { completion(nil); return }
+        
+        let prompt = "Hava durumu \(weather) ve kullanıcının ruh hali \(userInput). Bana bu duruma uygun sadece 2-3 kelimelik İngilizce bir müzik arama terimi üret (Örn: Lofi Jazz beats). Başka açıklama yazma."
+        
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type") //etiketi
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
         let body: [String: Any] = [
-            "contents": [
-                [
-                    "parts": [
-                        ["text": prompt]
-                    ]
-                ]
-            ]
+            "contents": [["parts": [["text": prompt]]]]
         ]
-
+        
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
         
         URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data else { completion(nil); return }
             
-            guard let data = data else {
-                completion(nil)
-                return
+            if let jsonString = String(data: data, encoding: .utf8) {
+                print("Google Cevabı: \(jsonString)")
             }
             
             if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -51,7 +66,6 @@ class AIService{
             } else {
                 completion(nil)
             }
-            
         }.resume()
     }
 }
