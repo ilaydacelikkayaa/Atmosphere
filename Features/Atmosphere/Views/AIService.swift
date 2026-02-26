@@ -37,7 +37,13 @@ class AIService {
         let urlString = "\(baseUrl)/v1beta/\(modelPath):generateContent?key=\(apiKey)"
         guard let url = URL(string: urlString) else { completion(nil); return }
         
-        let prompt = "Hava durumu \(weather) ve kullanıcının ruh hali \(userInput). Bana bu duruma uygun sadece 2-3 kelimelik İngilizce bir müzik arama terimi üret (Örn: Lofi Jazz beats). Başka açıklama yazma."
+        let prompt = """
+        Hava durumu \(weather) ve kullanıcı \(userInput) yapmak istiyor. 
+        Sen profesyonel bir DJ'sin. Kullanıcıya bir çalma listesi hazırlıyorsun.
+        Bana şu formatta cevap ver:
+        Arama Terimi | Açıklama
+        Örnek: Türkçe Alternatif Rock | Hava biraz kapalı ama temizlik yaparken seni motive edecek harika bir liste hazırladım!
+        """
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"

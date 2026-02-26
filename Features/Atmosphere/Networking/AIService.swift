@@ -39,9 +39,14 @@ class AIService {
         
         let prompt = """
         Hava durumu: \(weather), Kullanıcı Aktivitesi: \(userInput). 
-        Bu atmosfere uygun popüler bir Türkçe şarkı ve sanatçı ismi öner. 
-        SADECE şarkı adı ve sanatçıyı yaz (Örn: 'Tarkan - Şımarık'). 
-        Başka hiçbir açıklama yazma.
+        Sen bir müzik küratörüsün. Bu atmosfere uygun bir çalma listesi hazırlaman gerekiyor. 
+        Bana şu formatta cevap ver:
+        Arama Terimi | Açıklama
+
+        Arama Terimi: iTunes'da aratıldığında 10-20 farklı popüler Türkçe şarkı döndürecek genel bir müzik tarzı olsun. (Örn: 'Popüler Türkçe Rock', '90lar Türkçe Pop', 'Yeni Nesil Alternatif Türkçe')
+        Açıklama: Kullanıcıya bu listeyi neden hazırladığını anlatan samimi bir cümle.
+
+        Örnek Çıktı: 90lar Türkçe Pop | Bugün hava biraz kapalı ama bu nostaljik şarkılarla enerjini yükseltip harika bir temizlik yapabilirsin!
         """
         
         var request = URLRequest(url: url)

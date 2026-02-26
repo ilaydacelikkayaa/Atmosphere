@@ -37,6 +37,7 @@
 		555FFFF12F46642100869182 /* Exceptions for "Models" folder in "Atmosphere" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				AtmosphereSnapshot.swift,
 				Track.swift,
 				WeatherModel.swift,
 			);
@@ -45,6 +46,7 @@
 		555FFFF22F472DC500869182 /* Exceptions for "Views" folder in "Atmosphere" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				HistoryViewController.swift,
 				ViewController.swift,
 			);
 			target = 555FFFC92F4656A200869182 /* Atmosphere */;
