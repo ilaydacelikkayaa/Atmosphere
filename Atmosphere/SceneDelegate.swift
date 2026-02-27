@@ -18,7 +18,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // Uygulama açıldığında ilk görünecek ekran
         let rootVC = ViewController()
-        rootVC.view.backgroundColor = .systemBackground // Arka planı beyaz yapar
         
         let navVC = UINavigationController(rootViewController: rootVC)
         window?.rootViewController = navVC

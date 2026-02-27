@@ -13,12 +13,18 @@ class ViewController: UIViewController {
     private var tracks: [Track] = []
     private var currentWeather: WeatherResponse?
     let aiService = AIService()
+    private let headerView = UIView()
     private let label: UILabel = {
             let l = UILabel()
-            l.numberOfLines = 0
+            l.numberOfLines = 0 //sınırsız metin gostergesi
             l.textAlignment = .center
-            l.font = .systemFont(ofSize: 26, weight: .bold)
+            l.font = .systemFont(ofSize: 28, weight: .black)
+            l.textColor = .white
             l.text = "Hava Durumu Yükleniyor..."
+            l.layer.shadowColor = UIColor.black.cgColor
+            l.layer.shadowRadius = 3.0
+            l.layer.shadowOpacity = 0.5
+            l.layer.shadowOffset = CGSize(width: 2, height: 2)
             l.translatesAutoresizingMaskIntoConstraints = false
             return l
         }()
@@ -44,7 +50,19 @@ class ViewController: UIViewController {
     
     private let textField: UITextField = {
         let tf = UITextField()
-        tf.placeholder = "Ne yapmak istiyorsun?"
+        tf.backgroundColor = UIColor.white.withAlphaComponent(0.1)
+        tf.layer.cornerRadius = 12
+        tf.layer.borderWidth = 1
+        tf.layer.borderColor = UIColor.white.withAlphaComponent(0.2).cgColor //ince cerceve ekliyoruz
+        tf.textColor = .white
+        tf.font = .systemFont(ofSize: 16, weight: .medium)
+        tf.attributedPlaceholder = NSAttributedString(
+                string: "Ne yapmak istiyorsun?",
+                attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray]
+            )
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 15, height: 44))
+            tf.leftView = paddingView
+            tf.leftViewMode = .always
         tf.borderStyle = .roundedRect
         tf.translatesAutoresizingMaskIntoConstraints = false
         return tf
@@ -54,14 +72,24 @@ class ViewController: UIViewController {
         let tv = UITableView()
         tv.translatesAutoresizingMaskIntoConstraints = false
         tv.backgroundColor = .clear
-        tv.register(UITableViewCell.self, forCellReuseIdentifier: "cell") //reuse
+        tv.register(TrackCell.self, forCellReuseIdentifier: TrackCell.identifier)
+        tv.rowHeight = 110
+        tv.separatorStyle = .none
+        tv.backgroundView = nil
         return tv
     }()
     
     private let actionButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Find My Atmosphere", for: .normal)
-        button.titleLabel?.font = .boldSystemFont(ofSize: 18)
+        button.setTitle("Atmosferi Keşfet", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 18,weight:.bold)
+        button.tintColor = .white
+        button.backgroundColor = .systemIndigo
+        button.layer.cornerRadius = 22
+        button.layer.shadowColor = UIColor.systemIndigo.cgColor
+        button.layer.shadowRadius = 10
+        button.layer.shadowOpacity = 0.5
+            button.layer.shadowOffset = CGSize(width: 0, height: 4)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -69,15 +97,18 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         
             super.viewDidLoad()
-            view.backgroundColor = .systemBackground
+        
         tableView.dataSource = self
         tableView.delegate = self
             setupUI()
             setupBindings()
+        view.backgroundColor = UIColor(red: 0.05, green: 0.05, blue: 0.1, alpha: 1.0)
         saveButton.addTarget(self, action: #selector(saveMomentTapped), for: .touchUpInside)
         actionButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
-
-
+        
+        navigationController?.navigationBar.isTranslucent = true
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        navigationController?.navigationBar.shadowImage = UIImage()
             viewModel.fetchWeather(for: "Isparta")
         
         let historyButton = UIButton(type: .system)
@@ -149,41 +180,43 @@ class ViewController: UIViewController {
     }
     
     private func setupUI() {
-        view.addSubview(label)
-        view.addSubview(iconImageView)
         view.addSubview(tableView)
-        view.addSubview(textField)
-        view.addSubview(actionButton)
-        view.addSubview(saveButton)
+        headerView.addSubview(iconImageView)
+        headerView.addSubview(label)
+        headerView.addSubview(textField)
+        headerView.addSubview(actionButton)
+        headerView.addSubview(saveButton)
+
+        tableView.tableHeaderView = headerView
         
         NSLayoutConstraint.activate([
-            iconImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 60),
-            iconImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            iconImageView.topAnchor.constraint(equalTo: headerView.topAnchor, constant: 60),            iconImageView.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
             iconImageView.widthAnchor.constraint(equalToConstant: 100),
             iconImageView.heightAnchor.constraint(equalToConstant: 100),
             
             label.topAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: 20),
-            label.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            label.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 20),
+            label.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -20),
             
             textField.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 25),
-            textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
-            textField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
+            textField.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 30),
+            textField.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -30),
             textField.heightAnchor.constraint(equalToConstant: 44),
 
             actionButton.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 20),
-            actionButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            actionButton.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
             
             saveButton.topAnchor.constraint(equalTo: actionButton.bottomAnchor, constant: 15),
-            saveButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            saveButton.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
             saveButton.widthAnchor.constraint(equalToConstant: 200),
             saveButton.heightAnchor.constraint(equalToConstant: 44),
             
-            tableView.topAnchor.constraint(equalTo: saveButton.bottomAnchor, constant: 20),
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+        headerView.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 500)
     }
 
     private func setupBindings() {
@@ -262,24 +295,15 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     
     // Kural 2: Her satırda ne yazacak?
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        
+        let cell = tableView.dequeueReusableCell(
+            withIdentifier: TrackCell.identifier,
+            for: indexPath
+        ) as! TrackCell
+        
         let track = tracks[indexPath.row]
-        // Şarkı ve Sanatçı adını yazdırıyoruz.
-        cell.textLabel?.text = "\(track.artistName ?? "") - \(track.trackName ?? "")"
-        cell.imageView?.image = UIImage(systemName:"music.note")
-        if let urlString=track.artworkUrl100, let url=URL(string:urlString){
-            URLSession.shared.dataTask(with: url) { data, _, _ in
-                if let data = data, let downloadedImage = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        // Sadece hala o satır ekrandaysa resmi bas (Scroll yaparken karışıklığı önler)
-                        if let currentIndexPath = tableView.indexPath(for: cell), currentIndexPath == indexPath {
-                            cell.imageView?.image = downloadedImage
-                            cell.setNeedsLayout() // Hücreye "İçeriğin değişti, kendini tekrar çiz" diyoruz
-                        }
-                    }
-                }
-            } .resume()
-        }
+        cell.configure(with: track)
+        
         return cell
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

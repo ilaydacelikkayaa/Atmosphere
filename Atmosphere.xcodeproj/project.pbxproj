@@ -6,7 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		552963952F51B9DA000FF52C /* TrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 552963942F51B9DA000FF52C /* TrackCell.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		552963942F51B9DA000FF52C /* TrackCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackCell.swift; sourceTree = "<group>"; };
 		555FFFCA2F4656A200869182 /* Atmosphere.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Atmosphere.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -139,6 +144,7 @@
 				555FFFE72F46589100869182 /* ViewModels */,
 				555FFFE62F46588900869182 /* Views */,
 				555F000F2F49F8F500869182 /* Networking */,
+				552963942F51B9DA000FF52C /* TrackCell.swift */,
 			);
 			path = Atmosphere;
 			sourceTree = "<group>";
@@ -217,6 +223,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				552963952F51B9DA000FF52C /* TrackCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
