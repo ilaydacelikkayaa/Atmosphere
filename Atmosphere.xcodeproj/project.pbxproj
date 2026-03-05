@@ -52,6 +52,8 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				HistoryViewController.swift,
+				PolaroidCell.swift,
+				PolaroidView.swift,
 				ViewController.swift,
 			);
 			target = 555FFFC92F4656A200869182 /* Atmosphere */;

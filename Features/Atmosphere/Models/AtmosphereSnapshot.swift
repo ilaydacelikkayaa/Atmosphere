@@ -13,4 +13,5 @@ struct AtmosphereSnapshot:Codable{
     let note: String
     let songName: String
     let artistName: String
+    let artworkUrl : String
 }

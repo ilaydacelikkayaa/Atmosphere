@@ -44,7 +44,7 @@ class AIService {
         Arama Terimi | Açıklama
 
         Arama Terimi: iTunes'da aratıldığında 10-20 farklı popüler Türkçe şarkı döndürecek genel bir müzik tarzı olsun. (Örn: 'Popüler Türkçe Rock', '90lar Türkçe Pop', 'Yeni Nesil Alternatif Türkçe')
-        Açıklama: Kullanıcıya bu listeyi neden hazırladığını anlatan samimi bir cümle.
+        Açıklama: Kullanıcıya bu listeyi neden hazırladığını anlatan samimi bir cümle. Sadece 1 veya 2 kısa cümleyle bu havayı yorumla. Metin 150 karakteri geçmesin
 
         Örnek Çıktı: 90lar Türkçe Pop | Bugün hava biraz kapalı ama bu nostaljik şarkılarla enerjini yükseltip harika bir temizlik yapabilirsin!
         """

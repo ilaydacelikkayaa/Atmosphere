@@ -19,8 +19,7 @@ class MusicService {
                 return
             }
             
-            // Filtreleme işlemini MUTLAKA bu süslü parantezlerin içinde yapmalısın!
-            // ... dataTask içindeki do bloğu ...
+     
             do {
                 let itunesResult = try JSONDecoder().decode(iTunesResponse.self, from: data)
                 let allTracks = itunesResult.results
@@ -45,7 +44,7 @@ class MusicService {
                 print("Çeviri Hatası: \(error)")
                 completion([])
             }
-            // ...
-        }.resume() // Görevi başlatan o meşhur komut
+            
+        }.resume()
     }
 }
