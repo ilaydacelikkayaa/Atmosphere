@@ -129,4 +129,23 @@ extension HistoryViewController: UICollectionViewDataSource, UICollectionViewDel
         let snapshot = snapshots[indexPath.item]
         showDetailPolaroid(for: snapshot)
     }
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
+            let deleteAction = UIAction(title: "Bu Anıyı Sil", image: UIImage(systemName: "trash"), attributes: .destructive) { [weak self] _ in
+                self?.deleteSnapshot(at: indexPath)
+            }
+            return UIMenu(title: "", children: [deleteAction])
+        }
+    }
 }
+        private extension HistoryViewController {
+            func deleteSnapshot(at indexPath: IndexPath) {
+                snapshots.remove(at: indexPath.item)
+                
+                if let encoded = try? JSONEncoder().encode(snapshots) {
+                    UserDefaults.standard.set(encoded, forKey: "AtmosphereHistory")
+                }
+            collectionView.deleteItems(at: [indexPath])
+            }
+        }

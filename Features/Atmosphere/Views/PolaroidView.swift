@@ -86,8 +86,9 @@ class PolaroidView: UIView {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         dateLabel.text = formatter.string(from: snapshot.date)
+        let highResUrlString = snapshot.artworkUrl.replacingOccurrences(of: "100x100", with: "600x600")
         
-        if let url = URL(string: snapshot.artworkUrl) {
+        if let url = URL(string: highResUrlString) {
             URLSession.shared.dataTask(with: url) { data, _, _ in
                 if let data = data {
                     DispatchQueue.main.async {

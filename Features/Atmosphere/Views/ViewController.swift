@@ -25,21 +25,23 @@ class ViewController: UIViewController {
         return view
     }()
 
-    
-    private let label: UILabel = {
-            let l = UILabel()
-            l.numberOfLines = 0 //sınırsız metin gostergesi
-            l.textAlignment = .center
-        l.font = .systemFont(ofSize: 22, weight: .bold)
+    private let cityLabel: UILabel = {
+        let l = UILabel()
+        l.textAlignment = .center
+        l.font = .systemFont(ofSize: 23, weight: .semibold)
         l.textColor = .white
-            l.text = "Hava Durumu Yükleniyor..."
-            l.layer.shadowColor = UIColor.black.cgColor
-            l.layer.shadowRadius = 3.0
-            l.layer.shadowOpacity = 0.5
-            l.layer.shadowOffset = CGSize(width: 2, height: 2)
-            l.translatesAutoresizingMaskIntoConstraints = false
-            return l
-        }()
+        l.translatesAutoresizingMaskIntoConstraints = false
+        return l
+    }()
+
+    private let temperatureLabel: UILabel = {
+        let l = UILabel()
+        l.textAlignment = .center
+        l.font = .systemFont(ofSize: 40, weight: .bold)
+        l.textColor = .white
+        l.translatesAutoresizingMaskIntoConstraints = false
+        return l
+    }()
     
     private let descriptionLabel: UILabel = {
         let l = UILabel()
@@ -55,8 +57,11 @@ class ViewController: UIViewController {
     private let saveButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle(" Bu Anı Mühürle", for: .normal)
-        button.setImage(UIImage(systemName: "bookmark.fill"), for: .normal)
         button.titleLabel?.font = .boldSystemFont(ofSize: 16)
+        button.backgroundColor = UIColor.white.withAlphaComponent(0.1)
+        button.setImage(UIImage(systemName: "sparkles"), for: .normal)
+        button.imageView?.tintColor = .white
+        button.semanticContentAttribute = .forceLeftToRight
         button.tintColor = .systemPink
         button.backgroundColor = .systemBackground.withAlphaComponent(0.8)
         button.layer.cornerRadius = 10
@@ -76,8 +81,8 @@ class ViewController: UIViewController {
         let tf = UITextField()
         tf.backgroundColor = UIColor.white.withAlphaComponent(0.1)
         tf.layer.cornerRadius = 12
-        tf.layer.borderWidth = 1
-        tf.layer.borderColor = UIColor.white.withAlphaComponent(0.2).cgColor //ince cerceve ekliyoruz
+        tf.backgroundColor = UIColor(red: 0.12, green: 0.12, blue: 0.2, alpha: 1)
+        tf.layer.cornerRadius = 16
         tf.textColor = .white
         tf.font = .systemFont(ofSize: 16, weight: .medium)
         tf.attributedPlaceholder = NSAttributedString(
@@ -87,7 +92,6 @@ class ViewController: UIViewController {
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 15, height: 44))
             tf.leftView = paddingView
             tf.leftViewMode = .always
-        tf.borderStyle = .roundedRect
         tf.translatesAutoresizingMaskIntoConstraints = false
         return tf
     }()
@@ -106,15 +110,26 @@ class ViewController: UIViewController {
     
     private let actionButton: UIButton = {
         let button = UIButton(type: .system)
+
         button.setTitle("Atmosferi Keşfet", for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 18,weight:.bold)
+        button.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
+
         button.tintColor = .white
-        button.backgroundColor = .systemIndigo
-        button.layer.cornerRadius = 22
-        button.layer.shadowColor = UIColor.systemIndigo.cgColor
-        button.layer.shadowRadius = 10
-        button.layer.shadowOpacity = 0.5
-            button.layer.shadowOffset = CGSize(width: 0, height: 4)
+
+        button.backgroundColor = UIColor(
+            red: 88/255,
+            green: 86/255,
+            blue: 214/255,
+            alpha: 1
+        )
+
+        button.layer.cornerRadius = 18
+
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowRadius = 8
+        button.layer.shadowOpacity = 0.3
+        button.layer.shadowOffset = CGSize(width: 0, height: 4)
+
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -162,8 +177,9 @@ class ViewController: UIViewController {
         
         descriptionLabel.text = "Atmosferin analiz ediliyor..."
         
-        guard let userInput = textField.text, !userInput.isEmpty,
-              let weatherInfo = label.text else { return }
+        guard let userInput = textField.text, !userInput.isEmpty else { return }
+
+        let weatherInfo = "\(cityLabel.text ?? "") \(temperatureLabel.text ?? "")"
         
         aiService.generateMusicQuery(weather: weatherInfo, userInput: userInput) { [weak self] response in
             guard let self = self, let response = response else { return }
@@ -191,11 +207,12 @@ class ViewController: UIViewController {
 
     private func fetchMusic(with query: String) {
         self.musicService.searchMusic(term: query) { [weak self] tracks in
+            guard let self = self else { return }
+
             DispatchQueue.main.async {
-                guard let self = self else { return }
                 self.tracks = tracks
                 self.tableView.reloadData()
-                self.label.text = "İşte Atmosferin İçin Seçtiğim Şarkılar!"
+                self.descriptionLabel.text = "İşte atmosferine uygun şarkılar!"
             }
         }
     }
@@ -221,12 +238,13 @@ class ViewController: UIViewController {
             view.addSubview(tableView)
             
             headerView.addSubview(iconImageView)
-            headerView.addSubview(label)
             headerView.addSubview(descriptionLabel)
             headerView.addSubview(textField)
             headerView.addSubview(actionButton)
             headerView.addSubview(saveButton)
-        NSLayoutConstraint.activate([
+            headerView.addSubview(cityLabel)
+            headerView.addSubview(temperatureLabel)
+         NSLayoutConstraint.activate([
                     headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
                     headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                     headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -234,26 +252,29 @@ class ViewController: UIViewController {
 
                     iconImageView.topAnchor.constraint(equalTo: headerView.topAnchor, constant: 30),
                     iconImageView.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
-                    iconImageView.widthAnchor.constraint(equalToConstant: 80),
-                    iconImageView.heightAnchor.constraint(equalToConstant: 80),
+                    iconImageView.widthAnchor.constraint(equalToConstant: 100),
+                    iconImageView.heightAnchor.constraint(equalToConstant: 100),
 
-                    label.topAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: 15),
-                    label.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 20),
-                    label.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -20),
+                    cityLabel.topAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: 12),
+                    cityLabel.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 20),
+                    cityLabel.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -20),
 
-                    descriptionLabel.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 8),
+                    temperatureLabel.topAnchor.constraint(equalTo: cityLabel.bottomAnchor, constant: 4),
+                    temperatureLabel.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
+
+                    descriptionLabel.topAnchor.constraint(equalTo: temperatureLabel.bottomAnchor, constant: 8),
                     descriptionLabel.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 30),
                     descriptionLabel.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -30),
 
                     textField.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 20),
                     textField.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 30),
                     textField.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -30),
-                    textField.heightAnchor.constraint(equalToConstant: 44),
+                    textField.heightAnchor.constraint(equalToConstant: 50),
 
                     actionButton.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 20),
                     actionButton.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
                     actionButton.widthAnchor.constraint(equalToConstant: 220),
-                    actionButton.heightAnchor.constraint(equalToConstant: 44),
+                    actionButton.heightAnchor.constraint(equalToConstant: 52),
 
                     saveButton.topAnchor.constraint(equalTo: actionButton.bottomAnchor, constant: 15),
                     saveButton.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
@@ -266,9 +287,9 @@ class ViewController: UIViewController {
                     tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
                 ])
         
-        label.isUserInteractionEnabled = true
+        cityLabel.isUserInteractionEnabled = true
         let cityTap = UITapGestureRecognizer(target: self, action: #selector(changeCityTapped))
-        label.addGestureRecognizer(cityTap)
+        cityLabel.addGestureRecognizer(cityTap)
     }
     @objc private func changeCityTapped() {
         let alert = UIAlertController(title: "Şehir Değiştir", message: "Görmek istediğin şehri yaz.", preferredStyle: .alert)
@@ -298,8 +319,8 @@ class ViewController: UIViewController {
                 self.iconImageView.image = UIImage(systemName: style.symbolName)
                 self.iconImageView.tintColor = style.color
                 
-                self.label.text = "\(weather.name)\n\(Int(weather.main.temp))°C"
-            }
+                self.cityLabel.text = weather.name
+                self.temperatureLabel.text = "\(Int(weather.main.temp))°"            }
         }
     }
  
@@ -339,7 +360,7 @@ class ViewController: UIViewController {
                         
                         let newSnapshot = AtmosphereSnapshot(
                             date: Date(),
-                            weather: self.label.text ?? "Güneşli",
+                            weather: "\(self.cityLabel.text ?? "") \(self.temperatureLabel.text ?? "")",
                             note: note,
                             songName: song,
                             artistName: foundTrack?.artistName ?? "",
